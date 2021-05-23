@@ -1,0 +1,140 @@
+---
+title: "Graficos de Rio banano y Estrella"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Diferentes Graficos de Rio Estrella y Rio Banano 
+
+Estos graficos han sido generados a partir de datos recolectados y almacenados en un archivo FDC.csv.Con el fin de resumirlo en diferentes graficos.
+
+``` {r echo=FALSE}
+inp <- read.csv("FDC.csv",na.strings = "")
+
+head(inp)
+dim(inp)
+
+inp[!complete.cases(inp),]
+```
+
+## Grafico I
+
+El primer grafico pone en perspectiva los dos caudales de los rios analizados para este trabajo.Haciendo una relacion de tiempo y los milimetros por dia de los caudales..
+
+``` {r echo=FALSE}
+windows(width = 5.5, height = 5)
+
+par(mar = c(6, 5, 4, 6.5))
+
+plot(inp[,2],type= "l",
+     main = "Serie de cadual Rio Estrella y Banano",
+     cex.main = "1.3",
+     col.main = "#006633",
+     xlab= "Tiempo", 
+     ylab = "Caudal (mm por dia",
+     col = "#339966"
+)
+lines(inp[ ,3], col = "#99FF33")
+
+
+legend(x = "bottomright",
+       inset = c(-0.31, 0),    
+       legend = c("Banano", "Estrella"), 
+       lty = c(1, 1),         
+       col = c("#339966", "#99FF33"),         
+       lwd = 2,
+       cex = 0.8,
+       bty = "n",
+       xpd = (TRUE)
+)
+```
+
+## Histograma I
+
+A continuacion se presentan los datos recolectados del agua precipitada en el caudal de Rio Estrella. Utilizando los cuartles para divir los datos.
+
+``` {r echo =FALSE}
+summary(inp[,2:3])
+hist(inp[,2], 
+     main =("Rio Estrella"),
+     col.main = "#333333",
+     xlab = "Agua por dia",
+     ylab = "Caudal",
+     col = "#999966"
+)
+```
+
+## Histograma II
+
+A continuacion se presentan los datos recolectados del agua precipitada en el caudal de Rio Banano. Utilizando los cuartles para divir los datos.
+
+``` {r echo =FALSE}
+hist(inp[,3],
+     main = "Rio Banano",
+     col.main = "#333333",
+     xlab = "Agua por dia",
+     ylab = "Caudal",
+     col = "#999966"
+)
+```
+
+## Grafico II
+
+Series de tiempo del Rio banano y Rio Estrella expuesto en meses y años.
+
+``` {r echo =FALSE}
+names(inp) <- c("fecha", "estrella","banano")
+attach(inp)
+
+Tempdate <- strptime(inp[,1], format= "%d/%m/%Y")
+sum
+
+MAQ_Estrella <- tapply(estrella, format(Tempdate, format = "%Y"), FUN = sum)   
+MAQ_Banano <- tapply(banano, format(Tempdate, format = "%Y"), FUN = sum)   
+
+write.csv(rbind(MAQ_Estrella, MAQ_Banano),file= "MAQ.csv")
+
+plot(MAQ_Banano,ylim = c(100,3000),
+     main = "Caudales por y mes de Rio Banano y Estrella",
+     col.main = "#333333",
+     xlab = "Meses",
+     ylab = "Años",
+     col = "#CC9900"
+)
+lines(MAQ_Estrella, col = "red")
+
+MAQ_Estrella <- tapply(estrella, format(Tempdate, format = "%m"), FUN = sum)   
+MAQ_Banano <- tapply(banano, format(Tempdate, format = "%m"), FUN = sum)   
+```
+
+## Grafico III
+
+Analisis de correlacion de Rio estrella y Rio banano.
+
+``` {r echo =FALSE}
+inp.lm <- lm(inp[,2] ~ inp[,3], data = inp)
+summary(inp.lm)
+
+corinp <- cor(inp[,2:3], method= "spearman")
+
+plot(inp[,2], inp[,3],
+     main = "Relacion caudales",
+     ylab = "Rio banano",
+     xlab = "Rio Estrella"
+)
+```
+``` {r echo =FALSE}
+inp.lm <- lm(inp[,2] ~ inp[,3], data=inp)
+
+summary(inp.lm)
+
+plot(inp.lm)
+```
+
+
+
+``` {r message=FALSE}
+```
